@@ -1,0 +1,44 @@
+<div class="login-container">
+  <div class="login-card">
+    <h2>Suivi Académique</h2>
+    <p>Connectez-vous pour suivre vos enfants</p>
+
+    <form [formGroup]="loginForm">
+      
+      <!-- ÉTAPE 1 : NUMÉRO DE TÉLÉPHONE -->
+      <div *ngIf="step === 'PHONE'">
+        <label>Numéro de téléphone</label>
+        <input type="text" formControlName="phone" placeholder="Ex: 670000000">
+        <button (click)="onRequestOtp()" [disabled]="loginForm.get('phone')?.invalid || isLoading">
+          {{ isLoading ? 'Envoi...' : 'Recevoir le code' }}
+        </button>
+      </div>
+
+      <!-- ÉTAPE 2 : CODE OTP -->
+      <div *ngIf="step === 'OTP'">
+        <div class="welcome-message" *ngIf="parentName">
+          <p class="welcome-text">Bienvenue</p>
+          <p class="parent-name">{{ parentName }}</p>
+        </div>
+        
+        <label>Code de validation (SMS)</label>
+        <input type="text" formControlName="code" placeholder="Entrez le code à 6 chiffres">
+        <button (click)="onVerifyOtp()" [disabled]="loginForm.get('code')?.invalid || isLoading">
+          {{ isLoading ? 'Vérification...' : 'Valider' }}
+        </button>
+        <p (click)="step = 'PHONE'" class="back-link">Changer de numéro</p>
+      </div>
+
+      <p class="error" *ngIf="errorMessage">{{ errorMessage }}</p>
+    </form>
+
+    <div class="help-section">
+      <p class="help-text">Nouveau numéro ?</p>
+      <button 
+         class="contact-link" 
+         (click)="openGmailCompose()">
+        Contactez l'administration
+      </button>
+    </div>
+  </div>
+</div>

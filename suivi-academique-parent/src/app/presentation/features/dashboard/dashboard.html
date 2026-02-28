@@ -1,0 +1,74 @@
+<div class="dashboard-container">
+  <header>
+    <h1>Mes Enfants</h1>
+    <button class="logout-btn" (click)='logout()'>Déconnexion</button>
+  </header>
+
+  <div class="loader" *ngIf="isLoading">Chargement des données...</div>
+
+  <div class="student-grid" *ngIf="!isLoading">
+    <div class="student-card" *ngFor="let enfant of enfants">
+      <div class="student-info">
+        <h3>{{ enfant.nom }} {{ enfant.prenom }}</h3>
+        <p class="classe">Classe : <strong>{{ enfant.classe }}</strong></p>
+        <p class="matricule">Matricule : {{ enfant.matricule }}</p>
+      </div>
+      
+      <div class="actions">
+        <button class="btn-notes" (click)="onDownloadNotes(enfant.matricule, enfant.nom)">
+          <i class="icon-file"></i> Notes (PDF)
+        </button>
+        <button class="btn-edt" (click)="onDownloadEDT(enfant.classe)">
+          <i class="icon-calendar"></i> Emploi du temps
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="no-data" *ngIf="!isLoading && enfants.length === 0">
+    Aucun enfant n'est rattaché à ce numéro de téléphone.
+  </div>
+
+  <!-- Modal pour téléchargement des notes -->
+  <div class="modal-overlay" *ngIf="showNotesModal" (click)="closeNotesModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Télécharger les notes</h2>
+        <button class="close-btn" (click)="closeNotesModal()">&times;</button>
+      </div>
+      
+      <div class="modal-body" *ngIf="selectedStudent">
+        <div class="student-summary">
+          <p class="student-name">{{ selectedStudent.nom }} {{ selectedStudent.prenom }}</p>
+          <p class="student-class">{{ selectedStudent.classe }}</p>
+        </div>
+
+        <div class="form-group">
+          <label for="anneeAcademique">Année académique</label>
+          <input 
+            type="text" 
+            id="anneeAcademique"
+            [(ngModel)]="anneeAcademique" 
+            placeholder="Ex: 2024-2025"
+            class="form-control">
+        </div>
+
+        <div class="form-group">
+          <label for="semestre">Période</label>
+          <select id="semestre" [(ngModel)]="semestre" class="form-control">
+            <option value="ANNUEL">Annuel</option>
+            <option value="SEMESTRE_1">1er Semestre</option>
+            <option value="SEMESTRE_2">2ème Semestre</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-cancel" (click)="closeNotesModal()">Annuler</button>
+        <button class="btn-download" (click)="confirmDownloadNotes()">
+          Télécharger
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
