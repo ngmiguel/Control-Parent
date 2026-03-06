@@ -23,9 +23,30 @@ export class LoginComponent {
     private cdr: ChangeDetectorRef
   ) {
     this.loginForm = this.fb.group({
-      phone: ['', [Validators.required, Validators.pattern('^[0-9]{9,}$')]],
-      code: ['', [Validators.required, Validators.minLength(4)]]
+      phone: ['', [Validators.required, this.cameroonPhoneValidator]],
+      code: ['', [Validators.required, Validators.minLength(6), Validators.maxLength(6), Validators.pattern('^[0-9]{6}$')]]
     });
+  }
+
+  // Validateur personnalisé pour les numéros camerounais
+  cameroonPhoneValidator(control: any) {
+    if (!control.value) {
+      return null;
+    }
+
+    // Nettoyer le numéro (enlever espaces, parenthèses, tirets, +)
+    const cleaned = control.value.replace(/[\s\(\)\-\+]/g, '');
+    
+    // Vérifier les formats camerounais:
+    // - 237XXXXXXXXX (avec indicatif)
+    // - 6XXXXXXXX (sans indicatif, commence par 6)
+    const cameroonPattern = /^(237)?6[0-9]{8}$/;
+    
+    if (!cameroonPattern.test(cleaned)) {
+      return { invalidCameroonPhone: true };
+    }
+    
+    return null;
   }
 
   onRequestOtp() {
@@ -34,6 +55,9 @@ export class LoginComponent {
     if (this.loginForm.get('phone')?.valid) {
       this.isLoading = true;
       this.cdr.detectChanges();
+      
+      // Nettoyer le numéro avant de l'envoyer
+      const cleanedPhone = this.loginForm.value.phone.replace(/[\s\(\)\-\+]/g, '');
       
       // MODE DÉVELOPPEMENT: Simulation sans appel API
       setTimeout(() => {
@@ -45,7 +69,7 @@ export class LoginComponent {
       }, 500);
       
       /* MODE PRODUCTION: Décommenter pour utiliser l'API réelle
-      this.authService.requestOtp(this.loginForm.value.phone).subscribe({
+      this.authService.requestOtp(cleanedPhone).subscribe({
         next: (response) => {
           if (response.parentName) {
             this.parentName = response.parentName;
@@ -70,15 +94,18 @@ export class LoginComponent {
     this.isLoading = true;
     this.cdr.detectChanges();
     
+    // Nettoyer le numéro avant de le stocker
+    const cleanedPhone = phone.replace(/[\s\(\)\-\+]/g, '');
+    
     // MODE DÉVELOPPEMENT: Simulation sans appel API
     setTimeout(() => {
-      localStorage.setItem('user_phone', phone);
+      localStorage.setItem('user_phone', cleanedPhone);
       localStorage.setItem('parent_name', this.parentName);
       this.router.navigate(['/dashboard']);
     }, 500);
     
     /* MODE PRODUCTION: Décommenter pour utiliser l'API réelle
-    this.authService.verifyOtp(phone, code).subscribe({
+    this.authService.verifyOtp(cleanedPhone, code).subscribe({
       next: (response) => {
         localStorage.setItem('user_phone', response.phone);
         localStorage.setItem('parent_name', response.parentName);
@@ -108,5 +135,16 @@ Merci.`;
 
     const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(to)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     window.open(gmailUrl, '_blank');
+  }
+
+  // Empêcher la saisie de caractères non numériques
+  onlyNumbers(event: KeyboardEvent): boolean {
+    const charCode = event.which ? event.which : event.keyCode;
+    // Autoriser uniquement les chiffres (0-9)
+    if (charCode < 48 || charCode > 57) {
+      event.preventDefault();
+      return false;
+    }
+    return true;
   }
 }

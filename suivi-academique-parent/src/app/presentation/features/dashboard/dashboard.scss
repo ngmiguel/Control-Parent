@@ -1,6 +1,6 @@
 .dashboard-container {
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
   padding: 20px;
 
   header {
@@ -85,7 +85,7 @@
         margin: 6px 0;
 
         strong {
-          color: #667eea;
+          color: #4facfe;
           font-weight: 700;
         }
       }
@@ -122,11 +122,11 @@
       }
 
       .btn-notes {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
         color: white;
 
         &:hover {
-          box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+          box-shadow: 0 4px 12px rgba(79, 172, 254, 0.4);
         }
       }
 
@@ -216,7 +216,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
 
   h2 {
     margin: 0;
@@ -252,7 +252,7 @@
   padding: 24px;
 
   .student-summary {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
     padding: 16px;
     border-radius: 8px;
     margin-bottom: 24px;
@@ -294,8 +294,8 @@
 
       &:focus {
         outline: none;
-        border-color: #667eea;
-        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        border-color: #4facfe;
+        box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.1);
       }
     }
 
@@ -332,12 +332,12 @@
   }
 
   .btn-download {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
     color: white;
 
     &:hover {
       transform: translateY(-2px);
-      box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+      box-shadow: 0 6px 16px rgba(79, 172, 254, 0.4);
     }
   }
 }
