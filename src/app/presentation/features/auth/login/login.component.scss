@@ -1,0 +1,341 @@
+/* ============================================
+   PAGE DE LOGIN - ULTRA COMPACT
+   Maximum 3 blocs, design minimaliste
+   ============================================ */
+
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: var(--spacing-lg);
+  background: #ffffff;
+}
+
+/* Carte ultra-compacte */
+.login-card {
+  background: #ffffff;
+  border-radius: var(--radius-xl);
+  box-shadow: 0 0 0 1px #e5e7eb, 0 4px 16px rgba(0, 0, 0, 0.06);
+  padding: var(--spacing-xl);
+  width: 100%;
+  max-width: 360px;
+  animation: scaleIn 0.5s ease-out;
+}
+
+/* En-tête minimaliste */
+.login-header {
+  text-align: center;
+  margin-bottom: var(--spacing-lg);
+
+  .logo-icon {
+    width: 56px;
+    height: 56px;
+    margin: 0 auto var(--spacing-md);
+    background: var(--primary-gradient);
+    border-radius: var(--radius-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    i {
+      width: 32px;
+      height: 32px;
+      color: white;
+    }
+  }
+
+  h1 {
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin: 0;
+    color: var(--text-primary);
+  }
+}
+
+/* Formulaire simplifié */
+.login-form {
+  .form-step {
+    animation: fadeIn 0.4s ease-out;
+  }
+
+  .form-group {
+    margin-bottom: var(--spacing-lg);
+
+    label {
+      display: block;
+      color: var(--text-primary);
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: var(--spacing-sm);
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 0.75rem;
+      border: 2px solid var(--border);
+      border-radius: var(--radius-md);
+      font-size: 1rem;
+      font-family: inherit;
+      transition: all var(--transition-base);
+      background: var(--bg-secondary);
+
+      &:focus {
+        outline: none;
+        border-color: var(--primary);
+        background: white;
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+      }
+
+      &::placeholder {
+        color: var(--text-tertiary);
+      }
+
+      &.code-input {
+        font-size: 1.5rem;
+        font-weight: 700;
+        letter-spacing: 0.5rem;
+        text-align: center;
+      }
+    }
+
+    .input-hint {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-xs);
+      margin-top: var(--spacing-xs);
+      color: #ef4444;
+      font-size: 0.8rem;
+
+      i {
+        width: 14px;
+        height: 14px;
+      }
+    }
+  }
+}
+
+/* Bannière de bienvenue simple */
+.welcome-banner {
+  padding: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+  background: var(--primary-gradient);
+  border-radius: var(--radius-md);
+  text-align: center;
+  color: white;
+
+  p {
+    margin: 0;
+    font-size: 0.95rem;
+
+    strong {
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+  }
+}
+
+/* Boutons */
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-xs);
+  width: 100%;
+  padding: 0.875rem;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 1rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all var(--transition-base);
+
+  i {
+    width: 18px;
+    height: 18px;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  &.btn-primary {
+    background: var(--primary-gradient);
+    color: white;
+    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+
+    &:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+    }
+  }
+
+  &.btn-link {
+    background: transparent;
+    color: var(--text-secondary);
+    margin-top: var(--spacing-sm);
+    padding: var(--spacing-sm);
+
+    &:hover {
+      color: var(--primary);
+    }
+  }
+
+  .loading-spinner {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+
+    i {
+      animation: spin 1s linear infinite;
+    }
+  }
+}
+
+/* Alerte */
+.alert {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+  margin-top: var(--spacing-lg);
+  font-size: 0.9rem;
+
+  i {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+  }
+
+  &.alert-error {
+    background: #fef2f2;
+    color: #991b1b;
+    border-left: 3px solid #ef4444;
+  }
+}
+
+/* Aide compacte */
+.help-section {
+  margin-top: var(--spacing-lg);
+  padding-top: var(--spacing-lg);
+  border-top: 1px solid var(--border);
+  text-align: center;
+
+  .help-link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    text-decoration: none;
+    transition: color 0.3s ease;
+
+    i {
+      width: 16px;
+      height: 16px;
+    }
+
+    &:hover {
+      color: var(--primary);
+    }
+  }
+}
+
+/* Animations */
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .login-container {
+    padding: var(--spacing-md);
+  }
+
+  .login-card {
+    padding: var(--spacing-lg);
+  }
+
+  .login-header h1 {
+    font-size: 1.25rem;
+  }
+}
+
+/* Mode sombre */
+body.dark-mode {
+  .login-container {
+    background: #0f172a;
+  }
+
+  .login-card {
+    background: #1e293b;
+    box-shadow: 0 0 0 1px #334155, 0 4px 16px rgba(0, 0, 0, 0.3);
+  }
+
+  .login-header h1 {
+    color: #f1f5f9;
+  }
+
+  .form-group {
+    label {
+      color: #f1f5f9;
+    }
+
+    .form-input {
+      background: #334155;
+      border-color: #475569;
+      color: #f1f5f9;
+
+      &:focus {
+        background: #1e293b;
+      }
+    }
+  }
+
+  .help-section {
+    border-top-color: #334155;
+
+    .help-link {
+      color: #cbd5e1;
+
+      &:hover {
+        color: #818cf8;
+      }
+    }
+  }
+
+  .alert.alert-error {
+    background: rgba(239, 68, 68, 0.1);
+    color: #fca5a5;
+  }
+}

@@ -1,0 +1,246 @@
+<div class="dashboard-container">
+  <!-- Navbar révolutionnaire flottante -->
+  <nav class="revolutionary-navbar" [class.scrolled]="isScrolled">
+    <div class="navbar-container">
+      <!-- Logo animé -->
+      <div class="navbar-brand">
+        <div class="brand-logo">
+          <div class="logo-ring"></div>
+          <div class="logo-ring"></div>
+          <i data-lucide="graduation-cap"></i>
+        </div>
+        <div class="brand-text">
+          <h1>Suivi Académique</h1>
+          <span class="brand-tagline">Excellence & Innovation</span>
+        </div>
+      </div>
+
+      <!-- Heure centralisée -->
+      <div class="navbar-center">
+        <div class="time-display-center">
+          <i data-lucide="clock"></i>
+          <span>{{ currentTime }}</span>
+        </div>
+      </div>
+
+      <!-- Actions utilisateur -->
+      <div class="navbar-actions">
+        <button class="action-btn theme-toggle" (click)="toggleDarkMode()" [title]="isDarkMode ? 'Mode clair' : 'Mode sombre'">
+          <i [attr.data-lucide]="isDarkMode ? 'sun' : 'moon'"></i>
+        </button>
+        
+        <div class="user-menu">
+          <button class="user-avatar">
+            <i data-lucide="user"></i>
+          </button>
+          <div class="user-dropdown">
+            <div class="dropdown-header">
+              <div class="user-info">
+                <p class="user-name">Parent</p>
+                <p class="user-phone">{{ parentPhone }}</p>
+              </div>
+            </div>
+            <div class="dropdown-divider"></div>
+            <button class="dropdown-item">
+              <i data-lucide="settings"></i>
+              <span>Paramètres</span>
+            </button>
+            <button class="dropdown-item">
+              <i data-lucide="help-circle"></i>
+              <span>Aide</span>
+            </button>
+            <div class="dropdown-divider"></div>
+            <button class="dropdown-item danger" (click)="logout()">
+              <i data-lucide="log-out"></i>
+              <span>Déconnexion</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Barre de progression -->
+    <div class="progress-bar"></div>
+  </nav>
+
+  <!-- Contenu principal avec espacement pour navbar -->
+  <main class="dashboard-main">
+    <!-- En-tête de page simplifié -->
+    <header class="page-header">
+      <div class="page-header-content">
+        <div class="page-icon">
+          <i data-lucide="users"></i>
+        </div>
+        <div class="page-text">
+          <h2 class="page-title">Mes Enfants</h2>
+          <p class="page-count">
+            <i data-lucide="user-check"></i>
+            {{ enfants.length }} enfant{{ enfants.length > 1 ? 's' : '' }} inscrit{{ enfants.length > 1 ? 's' : '' }}
+          </p>
+        </div>
+      </div>
+    </header>
+
+    <!-- Loader -->
+  <div class="loader-container" *ngIf="isLoading">
+    <div class="loader-spinner">
+      <i data-lucide="loader-2"></i>
+    </div>
+    <p>Chargement des données...</p>
+  </div>
+
+  <!-- Grille des étudiants -->
+  <div class="content-wrapper" *ngIf="!isLoading">
+    <div class="students-grid" *ngIf="enfants.length > 0">
+      <div class="student-card" *ngFor="let enfant of enfants; let i = index" 
+           [style.animation-delay]="(i * 0.1) + 's'">
+        
+        <!-- Header avec gradient -->
+        <div class="card-header">
+          <div class="header-pattern"></div>
+          <div class="header-content">
+            <div class="student-avatar-wrapper">
+              <div class="avatar-ring"></div>
+              <div class="student-avatar">
+                <i data-lucide="user"></i>
+              </div>
+            </div>
+            <div class="student-badge-wrapper">
+              <div class="badge-glow"></div>
+              <div class="student-badge">
+                <i data-lucide="award"></i>
+                <span>{{ enfant.classe }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Body avec informations simples -->
+        <div class="card-body">
+          <h3 class="student-name">{{ enfant.nom }} {{ enfant.prenom }}</h3>
+          
+          <div class="student-info-simple">
+            <span class="info-text">
+              <i data-lucide="bookmark"></i>
+              {{ enfant.classe }}
+            </span>
+            <span class="info-separator">•</span>
+            <span class="info-text">
+              <i data-lucide="hash"></i>
+              {{ enfant.matricule }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="card-actions">
+          <button class="action-btn btn-notes" (click)="onDownloadNotes(enfant.matricule, enfant.nom)">
+            <div class="btn-bg-effect"></div>
+            <div class="btn-content">
+              <i data-lucide="file-text"></i>
+              <span>Télécharger les notes</span>
+            </div>
+            <i data-lucide="download" class="btn-icon-end"></i>
+          </button>
+
+          <button class="action-btn btn-schedule" (click)="onDownloadEDT(enfant.classe)">
+            <div class="btn-bg-effect"></div>
+            <div class="btn-content">
+              <i data-lucide="calendar"></i>
+              <span>Emploi du temps</span>
+            </div>
+            <i data-lucide="arrow-right" class="btn-icon-end"></i>
+          </button>
+        </div>
+
+        <!-- Footer -->
+        <div class="card-footer">
+          <div class="footer-item">
+            <i data-lucide="clock"></i>
+            <span>Mis à jour aujourd'hui</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Message si aucune donnée -->
+    <div class="no-data-card" *ngIf="enfants.length === 0">
+      <div class="no-data-icon">
+        <i data-lucide="inbox"></i>
+      </div>
+      <h3>Aucun enfant trouvé</h3>
+      <p>Aucun enfant n'est rattaché à ce numéro de téléphone.</p>
+      <button class="btn-contact" (click)="logout()">
+        <i data-lucide="mail"></i>
+        Contacter l'administration
+      </button>
+    </div>
+  </div>
+  </main>
+
+  <!-- Modal pour téléchargement des notes -->
+  <div class="modal-overlay" *ngIf="showNotesModal" (click)="closeNotesModal()">
+    <div class="modal-container" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-icon">
+          <i data-lucide="file-text"></i>
+        </div>
+        <h2>Télécharger les notes</h2>
+        <button class="modal-close" (click)="closeNotesModal()">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+      
+      <div class="modal-body" *ngIf="selectedStudent">
+        <div class="student-info-card">
+          <div class="info-avatar">
+            <i data-lucide="user-check"></i>
+          </div>
+          <div class="info-content">
+            <p class="info-name">{{ selectedStudent.nom }} {{ selectedStudent.prenom }}</p>
+            <p class="info-class">
+              <i data-lucide="bookmark"></i>
+              {{ selectedStudent.classe }}
+            </p>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="anneeAcademique">
+            <i data-lucide="calendar-range"></i>
+            Année académique
+          </label>
+          <select 
+            id="anneeAcademique"
+            [(ngModel)]="anneeAcademique" 
+            class="form-select">
+            <option *ngFor="let annee of anneesAcademiques" [value]="annee">{{ annee }}</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="semestre">
+            <i data-lucide="calendar-clock"></i>
+            Période
+          </label>
+          <select id="semestre" [(ngModel)]="semestre" class="form-select">
+            <option value="ANNUEL">Annuel</option>
+            <option value="SEMESTRE_1">1er Semestre</option>
+            <option value="SEMESTRE_2">2ème Semestre</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-modal btn-cancel" (click)="closeNotesModal()">
+          <i data-lucide="x-circle"></i>
+          Annuler
+        </button>
+        <button class="btn-modal btn-confirm" (click)="confirmDownloadNotes()">
+          <i data-lucide="download"></i>
+          Télécharger
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
