@@ -1,0 +1,125 @@
+<div class="alerts-container">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="school-logo">
+                <img src="m.jpg" alt="Logo École" />
+            </div>
+            <h2 class="school-name">MySchel</h2>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a [routerLink]="['/dashboard']" class="nav-item active">
+                <i data-lucide="home"></i>
+                <span>Accueil</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <button class="logout-btn-full" (click)="logout()">
+                <i data-lucide="log-out"></i>
+                <span>Déconnexion</span>
+            </button>
+
+            <div class="user-profile">
+                <div class="user-avatar-small">
+                    <i data-lucide="user"></i>
+                </div>
+                <div class="user-info-small">
+                    <p class="user-name-small">M. Marc Dupont</p>
+                    <p class="user-role">Parent d'élève</p>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Contenu principal -->
+    <main class="alerts-main">
+        <!-- En-tête de page -->
+        <header class="page-header">
+            <div class="page-header-left">
+                <div class="mobile-header-top">
+                    <div class="school-logo-mobile">
+                        <img src="m.jpg" alt="Logo École" />
+                    </div>
+                    <h2 class="school-name-mobile">MySchel</h2>
+                </div>
+                <div class="header-title-group">
+                    <i data-lucide="bell" class="header-icon"></i>
+                    <h1 class="page-title">Alertes & Notifications</h1>
+                </div>
+            </div>
+            <div class="page-header-right">
+                <div class="search-box">
+                    <i data-lucide="search"></i>
+                    <input type="text" placeholder="Rechercher..." />
+                </div>
+                <button class="header-btn">
+                    <i data-lucide="settings"></i>
+                </button>
+                <button class="header-btn" (click)="logout()">
+                    <i data-lucide="message-square"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Onglets de filtrage -->
+        <div class="tabs-container">
+            <button class="tab-btn" [class.active]="activeTab === 'toutes'" (click)="setActiveTab('toutes')">
+                Toutes
+            </button>
+            <button class="tab-btn" [class.active]="activeTab === 'academique'" (click)="setActiveTab('academique')">
+                Académique
+            </button>
+            <button class="tab-btn" [class.active]="activeTab === 'absences'" (click)="setActiveTab('absences')">
+                Absences
+            </button>
+        </div>
+
+        <!-- Liste des alertes -->
+        <div class="alerts-content">
+            <div class="alerts-list">
+                <div class="alert-card" *ngFor="let alert of filteredAlerts"
+                    [class.alert-reunion]="alert.type === 'reunion'" [class.alert-absence]="alert.type === 'absence'"
+                    [class.alert-notes]="alert.type === 'notes'" [class.alert-sortie]="alert.type === 'sortie'"
+                    [class.alert-modification]="alert.type === 'modification'">
+
+                    <div class="alert-icon" [style.background]="alert.bgColor">
+                        <i [attr.data-lucide]="alert.icon"></i>
+                    </div>
+
+                    <div class="alert-content">
+                        <h3 class="alert-title">{{ alert.title }}</h3>
+                        <p class="alert-description">{{ alert.description }}</p>
+
+                        <div class="alert-footer">
+                            <button *ngIf="alert.actionLabel" class="alert-action-btn" (click)="onAlertAction(alert)">
+                                {{ alert.actionLabel }}
+                            </button>
+                        </div>
+                    </div>
+
+                    <span class="alert-time">{{ alert.time }}</span>
+                </div>
+            </div>
+
+            <!-- Notifications antérieures -->
+            <div class="older-notifications" *ngIf="activeTab === 'toutes'">
+                <h2 class="section-title">NOTIFICATIONS ANTÉRIEURES</h2>
+
+                <div class="older-alerts-list">
+                    <div class="older-alert-item" *ngFor="let alert of olderAlerts">
+                        <div class="older-alert-icon">
+                            <i [attr.data-lucide]="alert.icon"></i>
+                        </div>
+                        <div class="older-alert-content">
+                            <h4>{{ alert.title }}</h4>
+                            <p>{{ alert.description }}</p>
+                        </div>
+                        <span class="older-alert-time">{{ alert.time }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>

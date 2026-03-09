@@ -6,6 +6,7 @@ export interface Student {
   nomPere: string;
   nomMere: string;
   classe: string;
+  photo?: string;
 }
 
 export interface StudentListItem {
@@ -13,4 +14,5 @@ export interface StudentListItem {
   nom: string;
   prenom: string;
   classe: string;
+  photo?: string;
 }

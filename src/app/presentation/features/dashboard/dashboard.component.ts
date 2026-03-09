@@ -1,6 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef, AfterViewChecked } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { StudentService } from '../../../data/api/student.service';
 import { StudentListItem } from '../../../core/models/student.model';
 import { Router } from '@angular/router';
@@ -8,7 +9,7 @@ import { Router } from '@angular/router';
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss'
 })
@@ -19,7 +20,7 @@ export class DashboardComponent implements OnInit, AfterViewChecked {
   isScrolled = false;
   isDarkMode = false;
   currentTime: string = '';
-  
+
   // Modal pour téléchargement des notes
   showNotesModal = false;
   selectedStudent: StudentListItem | null = null;
@@ -28,7 +29,7 @@ export class DashboardComponent implements OnInit, AfterViewChecked {
   anneesAcademiques: string[] = [];
 
   constructor(
-    private studentService: StudentService, 
+    private studentService: StudentService,
     private router: Router,
     private cdr: ChangeDetectorRef
   ) {
@@ -44,14 +45,14 @@ export class DashboardComponent implements OnInit, AfterViewChecked {
       baseYear = currentYear;
       this.anneeAcademique = `${currentYear}-${currentYear + 1}`;
     }
-    
-    // Générer 10 années avant et 10 années après
+
+    // Générer les années académiques jusqu'à l'année courante (10 années avant)
     this.anneesAcademiques = [];
-    for (let i = -10; i <= 10; i++) {
+    for (let i = -10; i <= 0; i++) {
       const year = baseYear + i;
       this.anneesAcademiques.push(`${year}-${year + 1}`);
     }
-    
+
     // Charger le thème sauvegardé
     const savedTheme = localStorage.getItem('theme');
     this.isDarkMode = savedTheme === 'dark';
@@ -67,10 +68,10 @@ export class DashboardComponent implements OnInit, AfterViewChecked {
       return;
     }
     this.loadEnfants();
-    
+
     // Écouter le scroll pour la navbar
     window.addEventListener('scroll', this.onScroll.bind(this));
-    
+
     // Mettre à jour l'heure
     this.updateTime();
     setInterval(() => this.updateTime(), 1000);
@@ -90,8 +91,8 @@ export class DashboardComponent implements OnInit, AfterViewChecked {
 
   updateTime() {
     const now = new Date();
-    this.currentTime = now.toLocaleTimeString('fr-FR', { 
-      hour: '2-digit', 
+    this.currentTime = now.toLocaleTimeString('fr-FR', {
+      hour: '2-digit',
       minute: '2-digit'
     });
     this.cdr.detectChanges();
@@ -101,7 +102,7 @@ export class DashboardComponent implements OnInit, AfterViewChecked {
     this.isDarkMode = !this.isDarkMode;
     document.body.classList.toggle('dark-mode', this.isDarkMode);
     localStorage.setItem('theme', this.isDarkMode ? 'dark' : 'light');
-    
+
     // Réinitialiser les icônes après changement de thème
     setTimeout(() => {
       if (typeof (window as any).lucide !== 'undefined') {
@@ -118,28 +119,24 @@ export class DashboardComponent implements OnInit, AfterViewChecked {
       this.enfants = [
         {
           matricule: 'MAT001',
-          nom: 'KAMGA',
+          nom: 'Dupont',
           prenom: 'Jean',
-          classe: 'ING3'
+          classe: 'Inge 4 ISI',
+          photo: 'photo 1.jpg'
         },
         {
           matricule: 'MAT002',
-          nom: 'KAMGA',
+          nom: 'Dupont',
           prenom: 'Marie',
-          classe: 'ING1'
-        },
-        {
-          matricule: 'MAT003',
-          nom: 'KAMGA',
-          prenom: 'Paul',
-          classe: 'ING5'
+          classe: 'Inge 4 SRT',
+          photo: 'photo 2.jpg'
         }
       ];
       this.isLoading = false;
       console.log('Données chargées:', this.enfants);
       this.cdr.detectChanges();
     }, 800);
-    
+
     /* MODE PRODUCTION: Décommenter pour utiliser l'API réelle
     this.studentService.getEnfantsParParent(this.parentPhone!).subscribe({
       next: (data: StudentListItem[]) => {
@@ -178,9 +175,9 @@ Semestre: ${this.semestre}
 Classe: ${this.selectedStudent.classe}
 
 En mode développement, connectez votre backend pour télécharger le PDF réel.`);
-    
+
     this.closeNotesModal();
-    
+
     /* MODE PRODUCTION: Décommenter pour utiliser l'API réelle
     this.studentService.downloadNotes(
       this.selectedStudent.matricule, 
@@ -200,7 +197,7 @@ En mode développement, connectez votre backend pour télécharger le PDF réel.
   onDownloadEDT(classe: string) {
     // MODE DÉVELOPPEMENT: Simulation
     alert(`Téléchargement de l'emploi du temps pour la classe ${classe}\n\nEn mode développement, connectez votre backend pour télécharger le PDF réel.`);
-    
+
     /* MODE PRODUCTION: Décommenter pour utiliser l'API réelle
     this.studentService.downloadEmploiDuTemps(classe).subscribe((blob: Blob) => {
       const url = window.URL.createObjectURL(blob);
