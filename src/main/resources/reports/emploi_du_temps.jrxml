@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports
+              http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+              name="emploi_du_temps" pageWidth="842" pageHeight="595" orientation="Landscape" 
+              columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
+    
+    <parameter name="classe" class="java.lang.String"/>
+    <parameter name="filiere" class="java.lang.String"/>
+    <parameter name="niveau" class="java.lang.String"/>
+    <parameter name="dateGeneration" class="java.lang.String"/>
+    <parameter name="semaine" class="java.lang.String"/>
+    
+    <field name="horaire" class="java.lang.String"/>
+    <field name="lundi" class="java.lang.String"/>
+    <field name="mardi" class="java.lang.String"/>
+    <field name="mercredi" class="java.lang.String"/>
+    <field name="jeudi" class="java.lang.String"/>
+    <field name="vendredi" class="java.lang.String"/>
+    <field name="samedi" class="java.lang.String"/>
+    <field name="colorLundi" class="java.lang.String"/>
+    <field name="colorMardi" class="java.lang.String"/>
+    <field name="colorMercredi" class="java.lang.String"/>
+    <field name="colorJeudi" class="java.lang.String"/>
+    <field name="colorVendredi" class="java.lang.String"/>
+    <field name="colorSamedi" class="java.lang.String"/>
+    
+    <title>
+        <band height="80">
+            <staticText>
+                <reportElement x="0" y="0" width="802" height="20"/>
+                <textElement textAlignment="Center">
+                    <font size="16" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Emploi de temps]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="0" y="25" width="802" height="18"/>
+                <textElement textAlignment="Center">
+                    <font size="11" isBold="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$P{classe} + " - " + $P{filiere}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="0" y="48" width="802" height="15"/>
+                <textElement textAlignment="Center">
+                    <font size="9"/>
+                </textElement>
+                <textFieldExpression><![CDATA["(Semaine du " + $P{semaine} + ")"]]></textFieldExpression>
+            </textField>
+        </band>
+    </title>
+    
+    <columnHeader>
+        <band height="30">
+            <staticText>
+                <reportElement mode="Opaque" x="0" y="0" width="80" height="30" backcolor="#4472C4" forecolor="#FFFFFF"/>
+                <box><pen lineWidth="1.0" lineColor="#FFFFFF"/></box>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="9" isBold="true"/>
+                </textElement>
+                <text><![CDATA[HORAIRES]]></text>
+            </staticText>
+            <staticText>
+                <reportElement mode="Opaque" x="80" y="0" width="120" height="30" backcolor="#4472C4" forecolor="#FFFFFF"/>
+                <box><pen lineWidth="1.0" lineColor="#FFFFFF"/></box>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="9" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Lundi]]></text>
+            </staticText>
+            <staticText>
+                <reportElement mode="Opaque" x="200" y="0" width="120" height="30" backcolor="#4472C4" forecolor="#FFFFFF"/>
+                <box><pen lineWidth="1.0" lineColor="#FFFFFF"/></box>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="9" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Mardi]]></text>
+            </staticText>
+            <staticText>
+                <reportElement mode="Opaque" x="320" y="0" width="120" height="30" backcolor="#4472C4" forecolor="#FFFFFF"/>
+                <box><pen lineWidth="1.0" lineColor="#FFFFFF"/></box>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="9" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Mercredi]]></text>
+            </staticText>
+            <staticText>
+                <reportElement mode="Opaque" x="440" y="0" width="120" height="30" backcolor="#4472C4" forecolor="#FFFFFF"/>
+                <box><pen lineWidth="1.0" lineColor="#FFFFFF"/></box>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="9" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Jeudi]]></text>
+            </staticText>
+            <staticText>
+                <reportElement mode="Opaque" x="560" y="0" width="120" height="30" backcolor="#4472C4" forecolor="#FFFFFF"/>
+                <box><pen lineWidth="1.0" lineColor="#FFFFFF"/></box>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="9" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Vendredi]]></text>
+            </staticText>
+            <staticText>
+                <reportElement mode="Opaque" x="680" y="0" width="122" height="30" backcolor="#4472C4" forecolor="#FFFFFF"/>
+                <box><pen lineWidth="1.0" lineColor="#FFFFFF"/></box>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="9" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Samedi]]></text>
+            </staticText>
+        </band>
+    </columnHeader>
+    
+    <detail>
+        <band height="45">
+            <!-- Colonne horaires -->
+            <textField>
+                <reportElement mode="Opaque" x="0" y="0" width="80" height="45" backcolor="#E7E6E6"/>
+                <box><pen lineWidth="0.5"/></box>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="7" isBold="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{horaire}]]></textFieldExpression>
+            </textField>
+            
+            <!-- Lundi -->
+            <textField isBlankWhenNull="true">
+                <reportElement mode="Opaque" x="80" y="0" width="120" height="45"/>
+                <box topPadding="2" leftPadding="3" bottomPadding="2" rightPadding="3">
+                    <pen lineWidth="0.5"/>
+                </box>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="7" isBold="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{lundi}]]></textFieldExpression>
+            </textField>
+            
+            <!-- Mardi -->
+            <textField isBlankWhenNull="true">
+                <reportElement mode="Opaque" x="200" y="0" width="120" height="45"/>
+                <box topPadding="2" leftPadding="3" bottomPadding="2" rightPadding="3">
+                    <pen lineWidth="0.5"/>
+                </box>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="7" isBold="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{mardi}]]></textFieldExpression>
+            </textField>
+            
+            <!-- Mercredi -->
+            <textField isBlankWhenNull="true">
+                <reportElement mode="Opaque" x="320" y="0" width="120" height="45"/>
+                <box topPadding="2" leftPadding="3" bottomPadding="2" rightPadding="3">
+                    <pen lineWidth="0.5"/>
+                </box>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="7" isBold="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{mercredi}]]></textFieldExpression>
+            </textField>
+            
+            <!-- Jeudi -->
+            <textField isBlankWhenNull="true">
+                <reportElement mode="Opaque" x="440" y="0" width="120" height="45"/>
+                <box topPadding="2" leftPadding="3" bottomPadding="2" rightPadding="3">
+                    <pen lineWidth="0.5"/>
+                </box>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="7" isBold="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{jeudi}]]></textFieldExpression>
+            </textField>
+            
+            <!-- Vendredi -->
+            <textField isBlankWhenNull="true">
+                <reportElement mode="Opaque" x="560" y="0" width="120" height="45"/>
+                <box topPadding="2" leftPadding="3" bottomPadding="2" rightPadding="3">
+                    <pen lineWidth="0.5"/>
+                </box>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="7" isBold="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{vendredi}]]></textFieldExpression>
+            </textField>
+            
+            <!-- Samedi -->
+            <textField isBlankWhenNull="true">
+                <reportElement mode="Opaque" x="680" y="0" width="122" height="45"/>
+                <box topPadding="2" leftPadding="3" bottomPadding="2" rightPadding="3">
+                    <pen lineWidth="0.5"/>
+                </box>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="7" isBold="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{samedi}]]></textFieldExpression>
+            </textField>
+        </band>
+    </detail>
+</jasperReport>

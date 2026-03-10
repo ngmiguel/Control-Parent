@@ -1,0 +1,14 @@
+# Fichier de configuration locale - À COPIER en application-local.properties
+# NE PAS COMMITER application-local.properties dans Git!
+
+# Twilio Configuration (pour SMS réels)
+# Remplacez ces valeurs par vos vraies identifiants Twilio
+sms.twilio.account.sid=YOUR_TWILIO_ACCOUNT_SID_HERE
+sms.twilio.auth.token=YOUR_TWILIO_AUTH_TOKEN_HERE
+sms.twilio.phone.number=+1234567890
+
+# Pour utiliser ce fichier:
+# 1. Copiez ce fichier en application-local.properties
+# 2. Remplacez les valeurs ci-dessus par vos vrais identifiants Twilio
+# 3. Ajoutez --spring.profiles.active=local au démarrage de l'application
+# 4. Ou définissez SPRING_PROFILES_ACTIVE=local dans vos variables d'environnement

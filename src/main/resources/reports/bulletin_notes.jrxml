@@ -1,0 +1,370 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports
+              http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+              name="bulletin_notes" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
+    
+    <parameter name="matricule" class="java.lang.String"/>
+    <parameter name="nom" class="java.lang.String"/>
+    <parameter name="prenom" class="java.lang.String"/>
+    <parameter name="dateNaissance" class="java.lang.String"/>
+    <parameter name="classe" class="java.lang.String"/>
+    <parameter name="filiere" class="java.lang.String"/>
+    <parameter name="niveau" class="java.lang.String"/>
+    <parameter name="anneeAcademique" class="java.lang.String"/>
+    <parameter name="semestre" class="java.lang.String"/>
+    <parameter name="moyenneGenerale" class="java.lang.String"/>
+    <parameter name="appreciationGenerale" class="java.lang.String"/>
+    <parameter name="dateGeneration" class="java.lang.String"/>
+    
+    <field name="matiere" class="java.lang.String"/>
+    <field name="codeUE" class="java.lang.String"/>
+    <field name="pourcentageCC" class="java.lang.String"/>
+    <field name="noteCC" class="java.lang.String"/>
+    <field name="pourcentageSN" class="java.lang.String"/>
+    <field name="noteSN" class="java.lang.String"/>
+    <field name="pourcentageTP" class="java.lang.String"/>
+    <field name="noteTP" class="java.lang.String"/>
+    <field name="moyenne" class="java.lang.String"/>
+    
+    <title>
+        <band height="150">
+            <rectangle>
+                <reportElement x="0" y="0" width="555" height="150" backcolor="#5B9BD5"/>
+                <graphicElement>
+                    <pen lineWidth="0"/>
+                </graphicElement>
+            </rectangle>
+            <staticText>
+                <reportElement x="0" y="10" width="555" height="30" forecolor="#FFFFFF"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="20" isBold="true"/>
+                </textElement>
+                <text><![CDATA[INSTITUT UNIVERSITAIRE SAINT JEAN]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="0" y="40" width="555" height="20" forecolor="#FFFFFF"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="14"/>
+                </textElement>
+                <text><![CDATA[BULLETIN DE NOTES]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="0" y="65" width="555" height="20" forecolor="#FFFFFF"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="12"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$P{anneeAcademique} + " - " + $P{semestre}]]></textFieldExpression>
+            </textField>
+            <staticText>
+                <reportElement x="20" y="100" width="80" height="20" forecolor="#FFFFFF"/>
+                <textElement verticalAlignment="Middle">
+                    <font size="10" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Matricule:]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="100" y="100" width="150" height="20" forecolor="#FFFFFF"/>
+                <textElement verticalAlignment="Middle">
+                    <font size="10"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$P{matricule}]]></textFieldExpression>
+            </textField>
+            <staticText>
+                <reportElement x="20" y="120" width="80" height="20" forecolor="#FFFFFF"/>
+                <textElement verticalAlignment="Middle">
+                    <font size="10" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Étudiant:]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="100" y="120" width="200" height="20" forecolor="#FFFFFF"/>
+                <textElement verticalAlignment="Middle">
+                    <font size="10"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$P{prenom} + " " + $P{nom}]]></textFieldExpression>
+            </textField>
+            <staticText>
+                <reportElement x="320" y="100" width="80" height="20" forecolor="#FFFFFF"/>
+                <textElement verticalAlignment="Middle">
+                    <font size="10" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Classe:]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="400" y="100" width="150" height="20" forecolor="#FFFFFF"/>
+                <textElement verticalAlignment="Middle">
+                    <font size="10"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$P{classe}]]></textFieldExpression>
+            </textField>
+            <staticText>
+                <reportElement x="320" y="120" width="80" height="20" forecolor="#FFFFFF"/>
+                <textElement verticalAlignment="Middle">
+                    <font size="10" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Filière:]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="400" y="120" width="150" height="20" forecolor="#FFFFFF"/>
+                <textElement verticalAlignment="Middle">
+                    <font size="10"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$P{filiere}]]></textFieldExpression>
+            </textField>
+        </band>
+    </title>
+    
+    <columnHeader>
+        <band height="30">
+            <rectangle>
+                <reportElement x="0" y="0" width="555" height="30" backcolor="#D3D3D3"/>
+            </rectangle>
+            <staticText>
+                <reportElement x="5" y="5" width="100" height="20"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="9" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Matière]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="110" y="5" width="80" height="20"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="9" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Code UE]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="195" y="5" width="50" height="20"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="9" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Type]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="250" y="5" width="80" height="20"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="9" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Pourcentage]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="335" y="5" width="60" height="20"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="9" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Note]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="400" y="5" width="150" height="20"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="9" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Moyenne]]></text>
+            </staticText>
+        </band>
+    </columnHeader>
+    
+    <detail>
+        <band height="75">
+            <!-- Bordures du bloc matière -->
+            <rectangle>
+                <reportElement x="0" y="0" width="555" height="75" mode="Transparent"/>
+                <graphicElement>
+                    <pen lineWidth="1.0"/>
+                </graphicElement>
+            </rectangle>
+            
+            <!-- Matière (fusionnée sur 3 lignes) -->
+            <textField>
+                <reportElement x="5" y="0" width="100" height="75"/>
+                <box>
+                    <rightPen lineWidth="1.0"/>
+                </box>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="9"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{matiere}]]></textFieldExpression>
+            </textField>
+            
+            <!-- Code UE (fusionné sur 3 lignes) -->
+            <textField>
+                <reportElement x="110" y="0" width="80" height="75"/>
+                <box>
+                    <rightPen lineWidth="1.0"/>
+                </box>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="8"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{codeUE}]]></textFieldExpression>
+            </textField>
+            
+            <!-- Ligne 1: CC -->
+            <rectangle>
+                <reportElement x="195" y="0" width="200" height="25" mode="Transparent"/>
+                <graphicElement>
+                    <pen lineWidth="0.5"/>
+                </graphicElement>
+            </rectangle>
+            <staticText>
+                <reportElement x="195" y="0" width="50" height="25"/>
+                <box>
+                    <rightPen lineWidth="1.0"/>
+                </box>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="9" isBold="true"/>
+                </textElement>
+                <text><![CDATA[CC]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="250" y="0" width="80" height="25"/>
+                <box>
+                    <rightPen lineWidth="1.0"/>
+                </box>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="9"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{pourcentageCC}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="335" y="0" width="60" height="25"/>
+                <box>
+                    <rightPen lineWidth="1.0"/>
+                </box>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="9"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{noteCC}]]></textFieldExpression>
+            </textField>
+            
+            <!-- Ligne 2: SN -->
+            <rectangle>
+                <reportElement x="195" y="25" width="200" height="25" mode="Transparent"/>
+                <graphicElement>
+                    <pen lineWidth="0.5"/>
+                </graphicElement>
+            </rectangle>
+            <staticText>
+                <reportElement x="195" y="25" width="50" height="25"/>
+                <box>
+                    <rightPen lineWidth="1.0"/>
+                </box>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="9" isBold="true"/>
+                </textElement>
+                <text><![CDATA[SN]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="250" y="25" width="80" height="25"/>
+                <box>
+                    <rightPen lineWidth="1.0"/>
+                </box>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="9"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{pourcentageSN}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="335" y="25" width="60" height="25"/>
+                <box>
+                    <rightPen lineWidth="1.0"/>
+                </box>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="9"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{noteSN}]]></textFieldExpression>
+            </textField>
+            
+            <!-- Ligne 3: TP -->
+            <rectangle>
+                <reportElement x="195" y="50" width="200" height="25" mode="Transparent"/>
+                <graphicElement>
+                    <pen lineWidth="0.5"/>
+                </graphicElement>
+            </rectangle>
+            <staticText>
+                <reportElement x="195" y="50" width="50" height="25"/>
+                <box>
+                    <rightPen lineWidth="1.0"/>
+                </box>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="9" isBold="true"/>
+                </textElement>
+                <text><![CDATA[TP]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="250" y="50" width="80" height="25"/>
+                <box>
+                    <rightPen lineWidth="1.0"/>
+                </box>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="9"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{pourcentageTP}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="335" y="50" width="60" height="25"/>
+                <box>
+                    <rightPen lineWidth="1.0"/>
+                </box>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="9"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{noteTP}]]></textFieldExpression>
+            </textField>
+            
+            <!-- Moyenne (fusionnée sur 3 lignes) -->
+            <textField>
+                <reportElement x="400" y="0" width="150" height="75"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="14" isBold="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{moyenne}]]></textFieldExpression>
+            </textField>
+        </band>
+    </detail>
+    
+    <summary>
+        <band height="100">
+            <rectangle>
+                <reportElement x="0" y="10" width="555" height="40" backcolor="#5B9BD5"/>
+            </rectangle>
+            <staticText>
+                <reportElement x="300" y="15" width="150" height="30" forecolor="#FFFFFF"/>
+                <textElement textAlignment="Right" verticalAlignment="Middle">
+                    <font size="14" isBold="true"/>
+                </textElement>
+                <text><![CDATA[MOYENNE GÉNÉRALE:]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="455" y="15" width="95" height="30" forecolor="#FFFFFF"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="16" isBold="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$P{moyenneGenerale} + "/20"]]></textFieldExpression>
+            </textField>
+            <staticText>
+                <reportElement x="20" y="60" width="100" height="20"/>
+                <textElement verticalAlignment="Middle">
+                    <font size="10" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Appréciation:]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="120" y="60" width="430" height="20"/>
+                <textElement verticalAlignment="Middle">
+                    <font size="10"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$P{appreciationGenerale}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="400" y="80" width="150" height="15"/>
+                <textElement textAlignment="Right" verticalAlignment="Middle">
+                    <font size="8" isItalic="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA["Généré le " + $P{dateGeneration}]]></textFieldExpression>
+            </textField>
+        </band>
+    </summary>
+</jasperReport>

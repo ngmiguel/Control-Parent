@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vérification du code - IUSJ</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 40px;
+            max-width: 400px;
+            width: 100%;
+        }
+        
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .logo h1 {
+            color: #667eea;
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+        
+        .logo p {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .info-box {
+            background: #f0f4ff;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .info-box p {
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .info-box .phone {
+            font-weight: 600;
+            color: #667eea;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+        }
+        
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 24px;
+            text-align: center;
+            letter-spacing: 10px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+            margin-bottom: 10px;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+        }
+        
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .btn-secondary {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+        
+        .message {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .message.show {
+            display: block;
+        }
+        
+        .help-text {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+            text-align: center;
+        }
+        
+        .timer {
+            text-align: center;
+            margin: 15px 0;
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .timer.warning {
+            color: #dc3545;
+            font-weight: 600;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 10px;
+        }
+        
+        .loading.show {
+            display: block;
+        }
+        
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+            <h1>🔐 Vérification</h1>
+            <p>Portail Parents IUSJ</p>
+        </div>
+        
+        <div class="info-box">
+            <p>Un code a été envoyé au</p>
+            <p class="phone" id="phoneDisplay"></p>
+        </div>
+        
+        <div id="message" class="message"></div>
+        
+        <form id="verifyForm">
+            <div class="form-group">
+                <label for="code">Code de vérification</label>
+                <input 
+                    type="text" 
+                    id="code" 
+                    name="code" 
+                    placeholder="000000"
+                    required
+                    maxlength="6"
+                    pattern="[0-9]{6}"
+                    autocomplete="off"
+                >
+                <div class="help-text">
+                    Entrez le code à 6 chiffres reçu par SMS
+                </div>
+            </div>
+            
+            <div class="timer" id="timer">
+                ⏱️ Code valide pendant : <span id="timeLeft">15:00</span>
+            </div>
+            
+            <button type="submit" id="submitBtn">
+                Vérifier le code
+            </button>
+            
+            <button type="button" class="btn-secondary" id="resendBtn">
+                Renvoyer le code
+            </button>
+        </form>
+        
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p style="margin-top: 10px; color: #666;">Vérification en cours...</p>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8080/api/auth';
+        
+        const form = document.getElementById('verifyForm');
+        const messageDiv = document.getElementById('message');
+        const loadingDiv = document.getElementById('loading');
+        const submitBtn = document.getElementById('submitBtn');
+        const resendBtn = document.getElementById('resendBtn');
+        const phoneDisplay = document.getElementById('phoneDisplay');
+        const timerDiv = document.getElementById('timer');
+        const timeLeftSpan = document.getElementById('timeLeft');
+        
+        // Récupérer le téléphone du localStorage
+        const telephone = localStorage.getItem('telephone');
+        
+        if (!telephone) {
+            window.location.href = 'index.html';
+        }
+        
+        phoneDisplay.textContent = telephone;
+        
+        // Timer de 15 minutes
+        let timeLeft = 15 * 60; // 15 minutes en secondes
+        
+        function updateTimer() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            timeLeftSpan.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+            
+            if (timeLeft <= 60) {
+                timerDiv.classList.add('warning');
+            }
+            
+            if (timeLeft <= 0) {
+                showMessage('Le code a expiré. Veuillez en demander un nouveau.', 'error');
+                submitBtn.disabled = true;
+            } else {
+                timeLeft--;
+            }
+        }
+        
+        // Démarrer le timer
+        updateTimer();
+        const timerInterval = setInterval(updateTimer, 1000);
+        
+        function showMessage(text, type) {
+            messageDiv.textContent = text;
+            messageDiv.className = `message ${type} show`;
+        }
+        
+        function hideMessage() {
+            messageDiv.className = 'message';
+        }
+        
+        // Auto-focus sur le champ de code
+        document.getElementById('code').focus();
+        
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const code = document.getElementById('code').value.trim();
+            
+            if (code.length !== 6) {
+                showMessage('Le code doit contenir 6 chiffres', 'error');
+                return;
+            }
+            
+            loadingDiv.classList.add('show');
+            submitBtn.disabled = true;
+            hideMessage();
+            
+            try {
+                const response = await fetch(`${API_URL}/verifier-code`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ telephone, code })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    // Succès - sauvegarder le token et rediriger
+                    localStorage.setItem('token', data.token);
+                    localStorage.removeItem('telephone');
+                    clearInterval(timerInterval);
+                    showMessage('Authentification réussie ! Redirection...', 'success');
+                    setTimeout(() => {
+                        window.location.href = 'home.html';
+                    }, 1500);
+                } else {
+                    showMessage(data.message || 'Code invalide ou expiré', 'error');
+                }
+            } catch (error) {
+                showMessage('Erreur de connexion au serveur', 'error');
+                console.error('Erreur:', error);
+            } finally {
+                loadingDiv.classList.remove('show');
+                submitBtn.disabled = false;
+            }
+        });
+        
+        resendBtn.addEventListener('click', async () => {
+            resendBtn.disabled = true;
+            hideMessage();
+            
+            try {
+                const response = await fetch(`${API_URL}/demander-code`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ telephone })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showMessage('Un nouveau code a été envoyé !', 'success');
+                    // Réinitialiser le timer
+                    timeLeft = 15 * 60;
+                    timerDiv.classList.remove('warning');
+                    submitBtn.disabled = false;
+                } else {
+                    showMessage(data.message || 'Erreur lors de l\'envoi du code', 'error');
+                }
+            } catch (error) {
+                showMessage('Erreur de connexion au serveur', 'error');
+                console.error('Erreur:', error);
+            } finally {
+                resendBtn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>
