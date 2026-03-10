@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { trigger, transition, style, animate } from '@angular/animations';
+import { AuthService } from '../../../../data/api/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -10,30 +11,20 @@ import { trigger, transition, style, animate } from '@angular/animations';
   imports: [CommonModule, FormsModule, ReactiveFormsModule],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss',
-  animations: [
-    trigger('fadeIn', [
-      transition(':enter', [
-        style({ opacity: 0, transform: 'translateY(20px)' }),
-        animate('400ms ease-out', style({ opacity: 1, transform: 'translateY(0)' }))
-      ])
-    ])
-  ]
 })
 export class LoginComponent implements AfterViewInit {
   loginForm: FormGroup;
-  step: 'PHONE' | 'OTP' = 'PHONE';
   isLoading = false;
   errorMessage = '';
-  parentName: string = '';
 
   constructor(
     private fb: FormBuilder,
     private router: Router,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private authService: AuthService
   ) {
     this.loginForm = this.fb.group({
-      phone: ['', [Validators.required, this.cameroonPhoneValidator]],
-      code: ['', [Validators.required, Validators.minLength(6), Validators.maxLength(6), Validators.pattern('^[0-9]{6}$')]]
+      phone: ['', [Validators.required, this.cameroonPhoneValidator]]
     });
   }
 
@@ -70,53 +61,28 @@ export class LoginComponent implements AfterViewInit {
   onRequestOtp() {
     if (this.loginForm.get('phone')?.valid) {
       this.isLoading = true;
+      this.errorMessage = '';
       this.cdr.detectChanges();
       
       // Nettoyer le numéro avant de l'envoyer
       const cleanedPhone = this.loginForm.value.phone.replace(/[\s\(\)\-\+]/g, '');
+      // Enlever le préfixe 237 si présent
+      const telephone = cleanedPhone.startsWith('237') ? cleanedPhone.substring(3) : cleanedPhone;
       
-      // MODE DÉVELOPPEMENT: Simulation sans appel API
-      setTimeout(() => {
-        this.parentName = 'M. KAMGA Pierre';
-        this.step = 'OTP';
-        this.isLoading = false;
-        this.errorMessage = '';
-        this.cdr.detectChanges();
-        
-        // Réinitialiser les icônes après changement de step
-        setTimeout(() => {
-          if (typeof (window as any).lucide !== 'undefined') {
-            (window as any).lucide.createIcons();
-          }
-        }, 100);
-      }, 500);
+      // Appel API réel
+      this.authService.demanderCode(telephone).subscribe({
+        next: (response) => {
+          // Sauvegarder temporairement le téléphone pour la page de vérification
+          localStorage.setItem('temp_phone', telephone);
+          this.router.navigate(['/verify-otp']);
+        },
+        error: (error) => {
+          this.isLoading = false;
+          this.errorMessage = error.error?.message || 'Erreur lors de l\'envoi du code. Vérifiez votre numéro.';
+          this.cdr.detectChanges();
+        }
+      });
     }
-  }
-
-  onVerifyOtp() {
-    const { phone, code } = this.loginForm.value;
-    this.isLoading = true;
-    this.cdr.detectChanges();
-    
-    // Nettoyer le numéro avant de le stocker
-    const cleanedPhone = phone.replace(/[\s\(\)\-\+]/g, '');
-    
-    // MODE DÉVELOPPEMENT: Simulation sans appel API
-    setTimeout(() => {
-      localStorage.setItem('user_phone', cleanedPhone);
-      localStorage.setItem('parent_name', this.parentName);
-      this.router.navigate(['/dashboard']);
-    }, 500);
-  }
-
-  // Empêcher la saisie de caractères non numériques
-  onlyNumbers(event: KeyboardEvent): boolean {
-    const charCode = event.which ? event.which : event.keyCode;
-    // Autoriser uniquement les chiffres (0-9)
-    if (charCode < 48 || charCode > 57) {
-      event.preventDefault();
-      return false;
-    }
-    return true;
   }
 }
+

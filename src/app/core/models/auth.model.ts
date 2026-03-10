@@ -1,14 +1,20 @@
-export interface OtpRequest {
-  phone: string;
+export interface DemandeCodeRequest {
+  telephone: string;
 }
 
-export interface OtpVerify {
-  phone: string;
+export interface VerificationCodeRequest {
+  telephone: string;
   code: string;
 }
 
 export interface AuthResponse {
-  token: string; // Si tu utilises JWT
-  parentName: string;
-  phone: string;
+  token: string;
+  type: string;
+  telephone: string;
+  message: string;
+}
+
+export interface MessageResponse {
+  message: string;
+  success: boolean;
 }

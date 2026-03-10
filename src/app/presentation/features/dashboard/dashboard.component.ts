@@ -2,7 +2,9 @@ import { Component, OnInit, ChangeDetectorRef, AfterViewChecked } from '@angular
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { StudentService } from '../../../data/api/student.service';
-import { StudentListItem } from '../../../core/models/student.model';
+import { BulletinService } from '../../../data/api/bulletin.service';
+import { EmploiDuTempsService } from '../../../data/api/emploi-du-temps.service';
+import { Student, Periode } from '../../../core/models/student.model';
 import { Router } from '@angular/router';
 
 @Component({
@@ -13,7 +15,7 @@ import { Router } from '@angular/router';
   styleUrl: './dashboard.scss'
 })
 export class DashboardComponent implements OnInit, AfterViewChecked {
-  enfants: StudentListItem[] = [];
+  enfants: Student[] = [];
   parentPhone: string | null = '';
   isLoading = true;
   isScrolled = false;
@@ -22,36 +24,20 @@ export class DashboardComponent implements OnInit, AfterViewChecked {
   
   // Modal pour téléchargement des notes
   showNotesModal = false;
-  selectedStudent: StudentListItem | null = null;
+  selectedStudent: Student | null = null;
   anneeAcademique: string = '';
-  semestre: string = 'ANNUEL';
+  semestre: string = 'Annuel';
   anneesAcademiques: string[] = [];
+  periodes: Periode[] = [];
+  isLoadingPeriodes = false;
 
   constructor(
-    private studentService: StudentService, 
+    private studentService: StudentService,
+    private bulletinService: BulletinService,
+    private emploiDuTempsService: EmploiDuTempsService,
     private router: Router,
     private cdr: ChangeDetectorRef
   ) {
-    // Générer l'année académique actuelle par défaut
-    const currentYear = new Date().getFullYear();
-    const currentMonth = new Date().getMonth();
-    // Si on est entre janvier et août, on est dans l'année N-1/N
-    let baseYear: number;
-    if (currentMonth < 8) {
-      baseYear = currentYear - 1;
-      this.anneeAcademique = `${currentYear - 1}-${currentYear}`;
-    } else {
-      baseYear = currentYear;
-      this.anneeAcademique = `${currentYear}-${currentYear + 1}`;
-    }
-    
-    // Générer 10 années avant et 10 années après
-    this.anneesAcademiques = [];
-    for (let i = -10; i <= 10; i++) {
-      const year = baseYear + i;
-      this.anneesAcademiques.push(`${year}-${year + 1}`);
-    }
-    
     // Charger le thème sauvegardé
     const savedTheme = localStorage.getItem('theme');
     this.isDarkMode = savedTheme === 'dark';
@@ -111,105 +97,135 @@ export class DashboardComponent implements OnInit, AfterViewChecked {
   }
 
   loadEnfants() {
-    console.log('loadEnfants appelé');
-    // MODE DÉVELOPPEMENT: Données de test
-    setTimeout(() => {
-      console.log('Chargement des données de test');
-      this.enfants = [
-        {
-          matricule: 'MAT001',
-          nom: 'KAMGA',
-          prenom: 'Jean',
-          classe: 'ING3'
-        },
-        {
-          matricule: 'MAT002',
-          nom: 'KAMGA',
-          prenom: 'Marie',
-          classe: 'ING1'
-        },
-        {
-          matricule: 'MAT003',
-          nom: 'KAMGA',
-          prenom: 'Paul',
-          classe: 'ING5'
-        }
-      ];
-      this.isLoading = false;
-      console.log('Données chargées:', this.enfants);
-      this.cdr.detectChanges();
-    }, 800);
+    this.isLoading = true;
+    console.log('🔄 Chargement des enfants...');
+    console.log('📞 Téléphone parent:', this.parentPhone);
     
-    /* MODE PRODUCTION: Décommenter pour utiliser l'API réelle
-    this.studentService.getEnfantsParParent(this.parentPhone!).subscribe({
-      next: (data: StudentListItem[]) => {
+    // Appel API réel
+    this.studentService.getMesEnfants().subscribe({
+      next: (data: Student[]) => {
+        console.log('✅ Données reçues du backend:', data);
+        console.log('📊 Nombre d\'enfants:', data.length);
         this.enfants = data;
         this.isLoading = false;
+        this.cdr.detectChanges();
       },
-      error: () => this.isLoading = false
+      error: (error) => {
+        console.error('❌ Erreur lors du chargement des enfants:', error);
+        console.error('📄 Détails de l\'erreur:', error.error);
+        console.error('🔢 Status:', error.status);
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      }
     });
-    */
   }
 
-  onDownloadNotes(matricule: string, nom: string) {
+  onDownloadNotes(matricule: string) {
+    console.log('📄 Téléchargement des notes pour:', matricule);
+    
     // Trouver l'étudiant sélectionné
     const student = this.enfants.find(e => e.matricule === matricule);
     if (student) {
+      console.log('👤 Étudiant trouvé:', student);
       this.selectedStudent = student;
+      this.isLoadingPeriodes = true;
       this.showNotesModal = true;
       this.cdr.detectChanges();
+      
+      // Charger les périodes disponibles
+      console.log('🔄 Chargement des périodes pour:', matricule);
+      this.bulletinService.getPeriodesDisponibles(matricule).subscribe({
+        next: (periodes) => {
+          console.log('✅ Périodes reçues:', periodes);
+          this.periodes = periodes;
+          
+          // Extraire les années académiques uniques
+          const anneesUniques = [...new Set(periodes.map(p => p.anneeAcademique))];
+          this.anneesAcademiques = anneesUniques;
+          console.log('📅 Années disponibles:', anneesUniques);
+          
+          // Sélectionner la première année par défaut
+          if (anneesUniques.length > 0) {
+            this.anneeAcademique = anneesUniques[0];
+            console.log('✅ Année sélectionnée par défaut:', this.anneeAcademique);
+          }
+          
+          this.isLoadingPeriodes = false;
+          this.cdr.detectChanges();
+        },
+        error: (error) => {
+          console.error('❌ Erreur lors du chargement des périodes:', error);
+          this.isLoadingPeriodes = false;
+          // Utiliser des valeurs par défaut
+          const currentYear = new Date().getFullYear();
+          this.anneesAcademiques = [`${currentYear}-${currentYear + 1}`];
+          this.anneeAcademique = this.anneesAcademiques[0];
+          console.log('⚠️ Utilisation de l\'année par défaut:', this.anneeAcademique);
+          this.cdr.detectChanges();
+        }
+      });
+    } else {
+      console.error('❌ Étudiant non trouvé avec le matricule:', matricule);
     }
   }
 
   closeNotesModal() {
     this.showNotesModal = false;
     this.selectedStudent = null;
+    this.periodes = [];
     this.cdr.detectChanges();
   }
 
   confirmDownloadNotes() {
     if (!this.selectedStudent) return;
 
-    // MODE DÉVELOPPEMENT: Simulation
-    alert(`Téléchargement des notes pour ${this.selectedStudent.nom} ${this.selectedStudent.prenom}
-    
-Année académique: ${this.anneeAcademique}
-Semestre: ${this.semestre}
-Classe: ${this.selectedStudent.classe}
+    console.log('📥 Téléchargement du bulletin...');
+    console.log('📋 Matricule:', this.selectedStudent.matricule);
+    console.log('📅 Année:', this.anneeAcademique);
+    console.log('📆 Semestre:', this.semestre);
 
-En mode développement, connectez votre backend pour télécharger le PDF réel.`);
-    
-    this.closeNotesModal();
-    
-    /* MODE PRODUCTION: Décommenter pour utiliser l'API réelle
-    this.studentService.downloadNotes(
-      this.selectedStudent.matricule, 
-      this.anneeAcademique, 
+    // Appel API réel pour télécharger le PDF
+    this.bulletinService.telechargerBulletinPDF(
+      this.selectedStudent.matricule,
+      this.anneeAcademique,
       this.semestre
-    ).subscribe((blob: Blob) => {
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `Notes_${this.selectedStudent!.nom}_${this.anneeAcademique}_${this.semestre}.pdf`;
-      link.click();
-      this.closeNotesModal();
+    ).subscribe({
+      next: (blob: Blob) => {
+        console.log('✅ PDF reçu, taille:', blob.size, 'bytes');
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `bulletin_notes_${this.selectedStudent!.matricule}_${this.anneeAcademique}_${this.semestre}.pdf`;
+        link.click();
+        window.URL.revokeObjectURL(url);
+        console.log('✅ Téléchargement lancé');
+        this.closeNotesModal();
+      },
+      error: (error) => {
+        console.error('❌ Erreur lors du téléchargement du bulletin:', error);
+        console.error('📄 Détails:', error.error);
+        console.error('🔢 Status:', error.status);
+        alert('Erreur lors du téléchargement du bulletin. Vérifiez la console pour plus de détails.');
+      }
     });
-    */
   }
 
-  onDownloadEDT(classe: string) {
-    // MODE DÉVELOPPEMENT: Simulation
-    alert(`Téléchargement de l'emploi du temps pour la classe ${classe}\n\nEn mode développement, connectez votre backend pour télécharger le PDF réel.`);
-    
-    /* MODE PRODUCTION: Décommenter pour utiliser l'API réelle
-    this.studentService.downloadEmploiDuTemps(classe).subscribe((blob: Blob) => {
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `Emploi_du_temps_${classe}.pdf`;
-      link.click();
+  onDownloadEDT(classeId: number) {
+    // Appel API réel pour télécharger le PDF
+    this.emploiDuTempsService.telechargerEmploiDuTempsPDF(classeId).subscribe({
+      next: (blob: Blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `emploi_du_temps_classe_${classeId}.pdf`;
+        link.click();
+        window.URL.revokeObjectURL(url);
+      },
+      error: (error) => {
+        console.error('Erreur lors du téléchargement de l\'emploi du temps:', error);
+        alert('Erreur lors du téléchargement de l\'emploi du temps. Veuillez réessayer.');
+      }
     });
-    */
   }
 
   logout() {

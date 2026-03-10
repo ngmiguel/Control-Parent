@@ -1,0 +1,81 @@
+<div class="verify-container">
+  <div class="verify-card">
+    <div class="verify-header">
+      <div class="logo-icon">
+        <i data-lucide="shield-check"></i>
+      </div>
+      <h1>Vérification</h1>
+      <p class="phone-number">{{ telephone }}</p>
+    </div>
+
+    @if (errorMessage) {
+      <div class="alert alert-error">
+        <i data-lucide="alert-circle"></i>
+        <span>{{ errorMessage }}</span>
+      </div>
+    }
+
+    <form [formGroup]="verifyForm" (ngSubmit)="onVerifyCode()" class="verify-form">
+      <div class="form-group">
+        <input 
+          id="code"
+          type="text" 
+          formControlName="code" 
+          placeholder="000000"
+          maxlength="6"
+          (keypress)="onlyNumbers($event)"
+          class="form-input code-input"
+          autofocus>
+        <p class="input-hint">Code à 6 chiffres</p>
+      </div>
+
+      <button 
+        type="submit"
+        class="btn btn-primary" 
+        [disabled]="verifyForm.invalid || isLoading || isExpired">
+        @if (!isLoading) {
+          <span>
+            <i data-lucide="check-circle"></i>
+            Vérifier
+          </span>
+        }
+        @if (isLoading) {
+          <span class="loading-spinner">
+            <i data-lucide="loader-2"></i>
+            Vérification...
+          </span>
+        }
+      </button>
+
+      <button 
+        type="button"
+        class="btn btn-secondary" 
+        (click)="onResendCode()"
+        [disabled]="!canResend || isLoading">
+        <i data-lucide="refresh-cw"></i>
+        @if (canResend) {
+          <span>Renvoyer le code</span>
+        }
+        @if (!canResend) {
+          <span>Disponible dans {{ getResendTime() }}</span>
+        }
+      </button>
+
+      <button 
+        type="button"
+        class="btn btn-link" 
+        (click)="onChangeNumber()"
+        [disabled]="isLoading">
+        <i data-lucide="arrow-left"></i>
+        Changer de numéro
+      </button>
+
+      @if (!isExpired) {
+        <div class="timer-info">
+          <i data-lucide="clock"></i>
+          <span>Expire dans {{ getFormattedTime() }}</span>
+        </div>
+      }
+    </form>
+  </div>
+</div>

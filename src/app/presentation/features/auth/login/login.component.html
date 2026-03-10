@@ -1,99 +1,57 @@
 <div class="login-container">
   <div class="login-card">
-    <!-- Logo simple -->
     <div class="login-header">
       <div class="logo-icon">
         <i data-lucide="graduation-cap"></i>
       </div>
-      <h1>Suivi Académique</h1>
+      <h1>Connexion</h1>
+      <p class="subtitle">Portail Parents</p>
     </div>
 
-    <form [formGroup]="loginForm" class="login-form">
-      
-      <!-- ÉTAPE 1 : NUMÉRO DE TÉLÉPHONE -->
-      <div *ngIf="step === 'PHONE'" class="form-step" [@fadeIn]>
-        <div class="form-group">
-          <label for="phone">Numéro de téléphone</label>
-          <input 
-            id="phone"
-            type="text" 
-            formControlName="phone" 
-            placeholder="6 90 12 34 56"
-            class="form-input">
-          <p class="input-hint" *ngIf="loginForm.get('phone')?.invalid && loginForm.get('phone')?.touched">
-            <i data-lucide="alert-circle"></i>
-            Format: 6XX XX XX XX
-          </p>
-        </div>
+    @if (errorMessage) {
+      <div class="alert alert-error">
+        <i data-lucide="alert-circle"></i>
+        <span>{{ errorMessage }}</span>
+      </div>
+    }
 
-        <button 
-          type="button"
-          class="btn btn-primary" 
-          (click)="onRequestOtp()" 
-          [disabled]="loginForm.get('phone')?.invalid || isLoading">
-          <span *ngIf="!isLoading">
+    <form [formGroup]="loginForm" (ngSubmit)="onRequestOtp()" class="login-form">
+      <div class="form-group">
+        <label for="phone">Numéro de téléphone</label>
+        <input 
+          id="phone"
+          type="tel" 
+          formControlName="phone" 
+          placeholder="6 90 12 34 56"
+          class="form-input">
+        @if (loginForm.get('phone')?.invalid && loginForm.get('phone')?.touched) {
+          <p class="input-hint">
+            <i data-lucide="alert-circle"></i>
+            Format attendu : 6XX XX XX XX
+          </p>
+        }
+      </div>
+
+      <button 
+        type="submit"
+        class="btn btn-primary" 
+        [disabled]="loginForm.get('phone')?.invalid || isLoading">
+        @if (!isLoading) {
+          <span>
             <i data-lucide="send"></i>
             Recevoir le code
           </span>
-          <span *ngIf="isLoading" class="loading-spinner">
+        }
+        @if (isLoading) {
+          <span class="loading-spinner">
             <i data-lucide="loader-2"></i>
-            Envoi...
+            Envoi en cours...
           </span>
-        </button>
-      </div>
-
-      <!-- ÉTAPE 2 : CODE OTP -->
-      <div *ngIf="step === 'OTP'" class="form-step" [@fadeIn]>
-        <div class="welcome-banner" *ngIf="parentName">
-          <p>Bienvenue <strong>{{ parentName }}</strong></p>
-        </div>
-        
-        <div class="form-group">
-          <label for="code">Code de validation</label>
-          <input 
-            id="code"
-            type="text" 
-            formControlName="code" 
-            placeholder="000000"
-            maxlength="6"
-            (keypress)="onlyNumbers($event)"
-            class="form-input code-input">
-          <p class="input-hint" *ngIf="loginForm.get('code')?.invalid && loginForm.get('code')?.touched">
-            <i data-lucide="alert-circle"></i>
-            Code à 6 chiffres
-          </p>
-        </div>
-
-        <button 
-          type="button"
-          class="btn btn-primary" 
-          (click)="onVerifyOtp()" 
-          [disabled]="loginForm.get('code')?.invalid || isLoading">
-          <span *ngIf="!isLoading">
-            <i data-lucide="check-circle"></i>
-            Valider
-          </span>
-          <span *ngIf="isLoading" class="loading-spinner">
-            <i data-lucide="loader-2"></i>
-            Vérification...
-          </span>
-        </button>
-
-        <button type="button" class="btn btn-link" (click)="step = 'PHONE'">
-          <i data-lucide="arrow-left"></i>
-          Changer de numéro
-        </button>
-      </div>
-
-      <!-- Message d'erreur -->
-      <div class="alert alert-error" *ngIf="errorMessage">
-        <i data-lucide="alert-triangle"></i>
-        <span>{{ errorMessage }}</span>
-      </div>
+        }
+      </button>
     </form>
 
-    <!-- Aide compacte -->
-    <div class="help-section" *ngIf="step === 'PHONE'">
+    <div class="help-section">
       <a href="https://mail.google.com/mail/?view=cm&fs=1&to=zacharie.melongo@saintjeaningenieur.org&su=Demande%20d'ajout%20de%20num%C3%A9ro&body=Bonjour%2C%0D%0AJe%20souhaite%20ajouter%20mon%20num%C3%A9ro."
          class="help-link" 
          target="_blank">
