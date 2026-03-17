@@ -1,84 +1,94 @@
-import { Component, OnInit, ChangeDetectorRef, AfterViewChecked } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef, AfterViewChecked } from '@angular/core';
+import { CommonModule, DatePipe, TitleCasePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
 import { StudentService } from '../../../data/api/student.service';
+import { BulletinService } from '../../../data/api/bulletin.service';
+import { EmploiDuTempsService } from '../../../data/api/emploi-du-temps.service';
+import { AuthService } from '../../../data/api/auth.service';
+import { NotificationService, Notification } from '../../../data/api/notification.service';
 import { StudentListItem } from '../../../core/models/student.model';
 import { Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, DatePipe, TitleCasePipe],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss'
 })
-export class DashboardComponent implements OnInit, AfterViewChecked {
+export class DashboardComponent implements OnInit, AfterViewChecked, OnDestroy {
   enfants: StudentListItem[] = [];
   parentPhone: string | null = '';
+  parentName: string = '';
   isLoading = true;
   isScrolled = false;
-  isDarkMode = false;
   currentTime: string = '';
 
-  // Modal pour téléchargement des notes
+  notifications: Notification[] = [];
+  nonLuesCount = 0;
+  private notifSub?: Subscription;
+  private timeInterval?: ReturnType<typeof setInterval>;
+
+  showNotifPanel = false;
+  filtreNotif: string = 'TOUS';
+  readonly filtresNotif = ['TOUS', 'REUNION', 'RESULTATS', 'ABSENCE', 'PAIEMENT', 'EVENEMENT'];
+
+  get notificationsFiltrees() {
+    if (this.filtreNotif === 'TOUS') return this.notifications;
+    return this.notifications.filter(n => n.type === this.filtreNotif);
+  }
+
   showNotesModal = false;
   selectedStudent: StudentListItem | null = null;
   anneeAcademique: string = '';
-  semestre: string = 'ANNUEL';
-  anneesAcademiques: string[] = [];
+  semestre: string = '';
+  periodesDisponibles: { anneeAcademique: string; semestre: string }[] = [];
+  isLoadingPeriodes = false;
+
+  get anneesDisponibles(): string[] {
+    return [...new Set(this.periodesDisponibles.map(p => p.anneeAcademique))];
+  }
+
+  get semestresDisponibles(): string[] {
+    return [...new Set(
+      this.periodesDisponibles
+        .filter(p => p.anneeAcademique === this.anneeAcademique)
+        .map(p => p.semestre)
+    )];
+  }
 
   constructor(
     private studentService: StudentService,
+    private bulletinService: BulletinService,
+    private emploiDuTempsService: EmploiDuTempsService,
+    private authService: AuthService,
+    private notificationService: NotificationService,
     private router: Router,
     private cdr: ChangeDetectorRef
   ) {
-    // Générer l'année académique actuelle par défaut
-    const currentYear = new Date().getFullYear();
-    const currentMonth = new Date().getMonth();
-    // Si on est entre janvier et août, on est dans l'année N-1/N
-    let baseYear: number;
-    if (currentMonth < 8) {
-      baseYear = currentYear - 1;
-      this.anneeAcademique = `${currentYear - 1}-${currentYear}`;
-    } else {
-      baseYear = currentYear;
-      this.anneeAcademique = `${currentYear}-${currentYear + 1}`;
-    }
-
-    // Générer les années académiques jusqu'à l'année courante (10 années avant)
-    this.anneesAcademiques = [];
-    for (let i = -10; i <= 0; i++) {
-      const year = baseYear + i;
-      this.anneesAcademiques.push(`${year}-${year + 1}`);
-    }
-
-    // Charger le thème sauvegardé
     const savedTheme = localStorage.getItem('theme');
-    this.isDarkMode = savedTheme === 'dark';
-    if (this.isDarkMode) {
-      document.body.classList.add('dark-mode');
+    if (savedTheme === 'dark') {
+      document.body.classList.remove('dark-mode');
+      localStorage.removeItem('theme');
     }
   }
 
   ngOnInit(): void {
-    this.parentPhone = localStorage.getItem('user_phone');
-    if (!this.parentPhone) {
+    const token = localStorage.getItem('token');
+    if (!token) {
       this.router.navigate(['/login']);
       return;
     }
+    this.parentPhone = localStorage.getItem('user_phone');
     this.loadEnfants();
-
-    // Écouter le scroll pour la navbar
+    this.loadNotifications();
     window.addEventListener('scroll', this.onScroll.bind(this));
-
-    // Mettre à jour l'heure
     this.updateTime();
-    setInterval(() => this.updateTime(), 1000);
+    this.timeInterval = setInterval(() => this.updateTime(), 1000);
   }
 
   ngAfterViewChecked() {
-    // Initialiser les icônes Lucide après chaque changement de vue
     if (typeof (window as any).lucide !== 'undefined') {
       (window as any).lucide.createIcons();
     }
@@ -91,70 +101,93 @@ export class DashboardComponent implements OnInit, AfterViewChecked {
 
   updateTime() {
     const now = new Date();
-    this.currentTime = now.toLocaleTimeString('fr-FR', {
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+    this.currentTime = now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
     this.cdr.detectChanges();
   }
 
-  toggleDarkMode() {
-    this.isDarkMode = !this.isDarkMode;
-    document.body.classList.toggle('dark-mode', this.isDarkMode);
-    localStorage.setItem('theme', this.isDarkMode ? 'dark' : 'light');
+  loadNotifications() {
+    this.notificationService.getAll().subscribe({
+      next: (data) => {
+        this.notifications = data;
+        this.nonLuesCount = data.filter(n => !n.lu).length;
+        this.cdr.detectChanges();
+      },
+      error: () => { }
+    });
 
-    // Réinitialiser les icônes après changement de thème
-    setTimeout(() => {
-      if (typeof (window as any).lucide !== 'undefined') {
-        (window as any).lucide.createIcons();
-      }
-    }, 100);
+    const token = localStorage.getItem('token');
+    if (token) {
+      this.notificationService.connecterSSE(token);
+      this.notifSub = this.notificationService.notification$.subscribe(notif => {
+        this.notifications.unshift(notif);
+        this.nonLuesCount++;
+        this.cdr.detectChanges();
+      });
+    }
+  }
+
+  toggleNotifPanel() {
+    this.showNotifPanel = !this.showNotifPanel;
+    this.cdr.detectChanges();
+  }
+
+  marquerToutesCommeLues() {
+    this.notificationService.marquerToutesCommeLues().subscribe(() => {
+      this.notifications.forEach(n => n.lu = true);
+      this.nonLuesCount = 0;
+      this.cdr.detectChanges();
+    });
   }
 
   loadEnfants() {
-    console.log('loadEnfants appelé');
-    // MODE DÉVELOPPEMENT: Données de test
-    setTimeout(() => {
-      console.log('Chargement des données de test');
-      this.enfants = [
-        {
-          matricule: 'MAT001',
-          nom: 'Dupont',
-          prenom: 'Jean',
-          classe: 'Inge 4 ISI',
-          photo: 'photo 1.jpg'
-        },
-        {
-          matricule: 'MAT002',
-          nom: 'Dupont',
-          prenom: 'Marie',
-          classe: 'Inge 4 SRT',
-          photo: 'photo 2.jpg'
-        }
-      ];
-      this.isLoading = false;
-      console.log('Données chargées:', this.enfants);
-      this.cdr.detectChanges();
-    }, 800);
-
-    /* MODE PRODUCTION: Décommenter pour utiliser l'API réelle
-    this.studentService.getEnfantsParParent(this.parentPhone!).subscribe({
+    this.studentService.getMesEnfants().subscribe({
       next: (data: StudentListItem[]) => {
         this.enfants = data;
+        if (data.length > 0 && data[0].nomParent) {
+          this.parentName = data[0].nomParent;
+        }
         this.isLoading = false;
+        this.cdr.detectChanges();
       },
-      error: () => this.isLoading = false
+      error: (error: any) => {
+        console.error('Erreur chargement enfants:', error);
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      }
     });
-    */
+  }
+
+  getStudentPhoto(index: number): string | null {
+    const photos: (string | null)[] = ['photo 1.jpg', 'photo 2.jpg', null];
+    return photos[index] ?? null;
   }
 
   onDownloadNotes(matricule: string, nom: string) {
-    // Trouver l'étudiant sélectionné
     const student = this.enfants.find(e => e.matricule === matricule);
     if (student) {
       this.selectedStudent = student;
+      this.periodesDisponibles = [];
+      this.anneeAcademique = '';
+      this.semestre = '';
+      this.isLoadingPeriodes = true;
       this.showNotesModal = true;
       this.cdr.detectChanges();
+
+      this.bulletinService.getPeriodesDisponibles(matricule).subscribe({
+        next: (periodes) => {
+          this.periodesDisponibles = periodes;
+          if (periodes.length > 0) {
+            this.anneeAcademique = periodes[0].anneeAcademique;
+            this.semestre = periodes[0].semestre;
+          }
+          this.isLoadingPeriodes = false;
+          this.cdr.detectChanges();
+        },
+        error: () => {
+          this.isLoadingPeriodes = false;
+          this.cdr.detectChanges();
+        }
+      });
     }
   }
 
@@ -166,51 +199,54 @@ export class DashboardComponent implements OnInit, AfterViewChecked {
 
   confirmDownloadNotes() {
     if (!this.selectedStudent) return;
-
-    // MODE DÉVELOPPEMENT: Simulation
-    alert(`Téléchargement des notes pour ${this.selectedStudent.nom} ${this.selectedStudent.prenom}
-    
-Année académique: ${this.anneeAcademique}
-Semestre: ${this.semestre}
-Classe: ${this.selectedStudent.classe}
-
-En mode développement, connectez votre backend pour télécharger le PDF réel.`);
-
-    this.closeNotesModal();
-
-    /* MODE PRODUCTION: Décommenter pour utiliser l'API réelle
-    this.studentService.downloadNotes(
-      this.selectedStudent.matricule, 
-      this.anneeAcademique, 
+    this.bulletinService.telechargerBulletinPDF(
+      this.selectedStudent.matricule,
+      this.anneeAcademique,
       this.semestre
-    ).subscribe((blob: Blob) => {
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `Notes_${this.selectedStudent!.nom}_${this.anneeAcademique}_${this.semestre}.pdf`;
-      link.click();
-      this.closeNotesModal();
+    ).subscribe({
+      next: (blob: Blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `bulletin_${this.selectedStudent!.matricule}_${this.anneeAcademique}_${this.semestre}.pdf`;
+        link.click();
+        window.URL.revokeObjectURL(url);
+        this.closeNotesModal();
+      },
+      error: (error: any) => {
+        console.error('Erreur téléchargement bulletin:', error);
+        alert('Erreur lors du téléchargement du bulletin.');
+      }
     });
-    */
   }
 
-  onDownloadEDT(classe: string) {
-    // MODE DÉVELOPPEMENT: Simulation
-    alert(`Téléchargement de l'emploi du temps pour la classe ${classe}\n\nEn mode développement, connectez votre backend pour télécharger le PDF réel.`);
-
-    /* MODE PRODUCTION: Décommenter pour utiliser l'API réelle
-    this.studentService.downloadEmploiDuTemps(classe).subscribe((blob: Blob) => {
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `Emploi_du_temps_${classe}.pdf`;
-      link.click();
+  onDownloadEDT(classeId: number) {
+    this.emploiDuTempsService.telechargerEmploiDuTempsPDF(classeId).subscribe({
+      next: (blob: Blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `Emploi_du_temps_classe_${classeId}.pdf`;
+        link.click();
+        window.URL.revokeObjectURL(url);
+      },
+      error: (error: any) => {
+        console.error('Erreur téléchargement EDT:', error);
+        alert('Erreur lors du téléchargement de l\'emploi du temps.');
+      }
     });
-    */
   }
 
   logout() {
+    this.notificationService.deconnecter();
+    this.authService.clearToken();
     localStorage.clear();
     this.router.navigate(['/login']);
+  }
+
+  ngOnDestroy() {
+    this.notifSub?.unsubscribe();
+    this.notificationService.deconnecter();
+    clearInterval(this.timeInterval);
   }
 }

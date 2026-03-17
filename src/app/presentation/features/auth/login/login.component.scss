@@ -21,6 +21,62 @@
   border-radius: 16px;
   overflow: hidden;
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+  animation: bookOpen 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ============================================
+   EFFET CAHIER QUI S'OUVRE
+   ============================================ */
+@keyframes bookOpen {
+  0% {
+    opacity: 0;
+    transform: perspective(1200px) rotateY(-8deg) scaleX(0.85);
+    box-shadow: -20px 8px 40px rgba(0, 0, 0, 0.25);
+  }
+
+  60% {
+    transform: perspective(1200px) rotateY(2deg) scaleX(1.01);
+  }
+
+  100% {
+    opacity: 1;
+    transform: perspective(1200px) rotateY(0deg) scaleX(1);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+  }
+}
+
+.left-section {
+  animation: pageLeft 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+  transform-origin: right center;
+}
+
+.right-section {
+  animation: pageRight 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+  transform-origin: left center;
+}
+
+@keyframes pageLeft {
+  0% {
+    opacity: 0;
+    transform: perspective(800px) rotateY(-12deg);
+  }
+
+  100% {
+    opacity: 1;
+    transform: perspective(800px) rotateY(0deg);
+  }
+}
+
+@keyframes pageRight {
+  0% {
+    opacity: 0;
+    transform: perspective(800px) rotateY(12deg);
+  }
+
+  100% {
+    opacity: 1;
+    transform: perspective(800px) rotateY(0deg);
+  }
 }
 
 /* ============================================
@@ -35,6 +91,9 @@
   color: #1f2937;
   position: relative;
   overflow: hidden;
+  border-right: 2px solid rgba(102, 126, 234, 0.15);
+  animation: pageLeft 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+  transform-origin: right center;
 }
 
 .brand-header {
@@ -119,6 +178,8 @@
   align-items: center;
   justify-content: center;
   padding: 1.5rem 1.25rem;
+  animation: pageRight 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+  transform-origin: left center;
 }
 
 .login-card {
@@ -387,6 +448,53 @@
   }
 }
 
+@keyframes pageFromLeft {
+  0% {
+    opacity: 0;
+    transform: perspective(600px) rotateY(12deg) translateX(-30px);
+  }
+
+  60% {
+    transform: perspective(600px) rotateY(-2deg) translateX(4px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: perspective(600px) rotateY(0deg) translateX(0);
+  }
+}
+
+@keyframes pageFromRight {
+  0% {
+    opacity: 0;
+    transform: perspective(600px) rotateY(-12deg) translateX(30px);
+  }
+
+  60% {
+    transform: perspective(600px) rotateY(2deg) translateX(-4px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: perspective(600px) rotateY(0deg) translateX(0);
+  }
+}
+
+.form-step {
+  animation-duration: 0.5s;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  animation-fill-mode: both;
+  transform-origin: center center;
+}
+
+.step-phone {
+  animation-name: pageFromLeft;
+}
+
+.step-otp {
+  animation-name: pageFromRight;
+}
+
 @keyframes spin {
   from {
     transform: rotate(0deg);
@@ -466,5 +574,42 @@
   .btn {
     padding: 0.6rem 0.9rem;
     font-size: 0.85rem;
+  }
+}
+
+
+/* ============================================
+   TIMER D'EXPIRATION DU CODE
+   ============================================ */
+.code-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.35rem;
+
+  label {
+    margin-bottom: 0;
+  }
+
+  .expiration-timer {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #059669;
+    background: #ecfdf5;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+
+    i {
+      width: 12px;
+      height: 12px;
+    }
+
+    &.warning {
+      color: #dc2626;
+      background: #fef2f2;
+    }
   }
 }
