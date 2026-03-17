@@ -3,7 +3,7 @@ package org.example.backend.dto;
 import java.time.LocalDate;
 
 public class EtudiantDTO {
-    
+
     private Long id;
     private String matricule;
     private String nom;
@@ -13,12 +13,13 @@ public class EtudiantDTO {
     private String filiere;
     private String niveau;
     private Long classeId;
+    private String nomParent;
 
     public EtudiantDTO() {
     }
 
-    public EtudiantDTO(Long id, String matricule, String nom, String prenom, LocalDate dateNaissance, 
-                      String classeLibelle, String filiere, String niveau, Long classeId) {
+    public EtudiantDTO(Long id, String matricule, String nom, String prenom, LocalDate dateNaissance,
+            String classeLibelle, String filiere, String niveau, Long classeId) {
         this.id = id;
         this.matricule = matricule;
         this.nom = nom;
@@ -101,5 +102,13 @@ public class EtudiantDTO {
 
     public void setClasseId(Long classeId) {
         this.classeId = classeId;
+    }
+
+    public String getNomParent() {
+        return nomParent;
+    }
+
+    public void setNomParent(String nomParent) {
+        this.nomParent = nomParent;
     }
 }

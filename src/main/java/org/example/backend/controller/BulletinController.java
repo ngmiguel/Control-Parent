@@ -1,5 +1,7 @@
 package org.example.backend.controller;
 
+import java.util.List;
+
 import org.example.backend.dto.MessageResponse;
 import org.example.backend.dto.NoteDTO;
 import org.example.backend.dto.PeriodeDTO;
@@ -9,9 +11,12 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/bulletin")
@@ -27,8 +32,8 @@ public class BulletinController {
     }
 
     /**
-     * GET /api/bulletin/periodes/{matricule}
-     * Récupère les périodes disponibles pour un étudiant
+     * GET /api/bulletin/periodes/{matricule} Récupère les périodes disponibles
+     * pour un étudiant
      */
     @GetMapping("/periodes/{matricule}")
     public ResponseEntity<?> getPeriodesDisponibles(@PathVariable String matricule) {
@@ -45,8 +50,8 @@ public class BulletinController {
     }
 
     /**
-     * GET /api/bulletin/notes/{matricule}
-     * Récupère les notes d'un étudiant (format JSON)
+     * GET /api/bulletin/notes/{matricule} Récupère les notes d'un étudiant
+     * (format JSON)
      */
     @GetMapping("/notes/{matricule}")
     public ResponseEntity<?> getNotesEtudiant(
@@ -71,9 +76,9 @@ public class BulletinController {
     }
 
     /**
-     * GET /api/bulletin/pdf/{matricule}
-     * Télécharge le bulletin de notes en PDF
-     * Si aucune période n'est spécifiée, génère le bulletin annuel de l'année en cours
+     * GET /api/bulletin/pdf/{matricule} Télécharge le bulletin de notes en PDF
+     * Si aucune période n'est spécifiée, génère le bulletin annuel de l'année
+     * en cours
      */
     @GetMapping("/pdf/{matricule}")
     public ResponseEntity<?> telechargerBulletinPDF(
@@ -88,12 +93,12 @@ public class BulletinController {
                 // Par défaut, générer le bulletin annuel de l'année en cours
                 pdfBytes = bulletinService.genererBulletinPDFParPeriode(matricule, "2024-2025", "Annuel");
             }
-            
+
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_PDF);
             headers.setContentDispositionFormData("attachment", "bulletin_" + matricule + ".pdf");
             headers.setCacheControl("must-revalidate, post-check=0, pre-check=0");
-            
+
             return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)

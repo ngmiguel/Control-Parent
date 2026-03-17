@@ -26,8 +26,8 @@ public class AuthService {
     private int otpLength;
 
     public AuthService(CodeValidationRepository codeValidationRepository,
-                      EtudiantRepository etudiantRepository,
-                      SmsService smsService) {
+            EtudiantRepository etudiantRepository,
+            SmsService smsService) {
         this.codeValidationRepository = codeValidationRepository;
         this.etudiantRepository = etudiantRepository;
         this.smsService = smsService;
@@ -50,17 +50,17 @@ public class AuthService {
      */
     public boolean estParentValide(String telephone) {
         String telNormalise = smsService.normaliserTelephone(telephone);
-        
+
         // Vérifier si le téléphone existe dans telephonePere ou telephoneMere
         List<Etudiant> etudiants = etudiantRepository
                 .findByTelephonePereContainingOrTelephoneMereContaining(telNormalise, telNormalise);
-        
+
         // Vérifier aussi sans normalisation pour les formats multiples
         if (etudiants.isEmpty()) {
             etudiants = etudiantRepository
                     .findByTelephonePereContainingOrTelephoneMereContaining(telephone, telephone);
         }
-        
+
         return !etudiants.isEmpty();
     }
 
@@ -76,7 +76,7 @@ public class AuthService {
 
         // Générer le code
         String code = genererCodeOTP();
-        
+
         // Créer l'entité CodeValidation
         CodeValidation codeValidation = new CodeValidation();
         codeValidation.setTelephone(telephone);
@@ -84,10 +84,10 @@ public class AuthService {
         codeValidation.setDateCreation(LocalDateTime.now());
         codeValidation.setDateExpiration(LocalDateTime.now().plusMinutes(otpExpirationMinutes));
         codeValidation.setUtilise(false);
-        
+
         // Sauvegarder en base
         codeValidationRepository.save(codeValidation);
-        
+
         // Envoyer le SMS
         smsService.envoyerCodeValidation(telephone, code);
     }
@@ -100,22 +100,22 @@ public class AuthService {
         // Rechercher le code non utilisé
         var codeValidationOpt = codeValidationRepository
                 .findByTelephoneAndCodeAndUtiliseFalse(telephone, code);
-        
+
         if (codeValidationOpt.isEmpty()) {
             return false;
         }
-        
+
         CodeValidation codeValidation = codeValidationOpt.get();
-        
+
         // Vérifier l'expiration
         if (LocalDateTime.now().isAfter(codeValidation.getDateExpiration())) {
             return false;
         }
-        
+
         // Marquer comme utilisé
         codeValidation.setUtilise(true);
         codeValidationRepository.save(codeValidation);
-        
+
         return true;
     }
 
